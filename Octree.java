@@ -1,4 +1,6 @@
 
+
+
 import Jcg.geometry.Point_3;
 import Jcg.geometry.Vector_3;
 import Jcg.geometry.PointCloud_3;
@@ -20,7 +22,8 @@ public class Octree {
         /**
          * Compute the bounding box
          */
-        ArrayList<Point_3> points_list = new ArrayList<Point_3>();
+        ArrayList<Point_3> points_list = new ArrayList<>(points.length);
+        for(Point_3 p : points){points_list.add(p);}
         PointCloud_3 pointCloud = new PointCloud_3(points_list);
         Point_3[] cube = pointCloud.boundingBox();
 
@@ -28,9 +31,9 @@ public class Octree {
          * Compute the center and the side length of the bounding box
          */
         Number coefficient[] = new Number[2]; // we want the mean of the cube, so we take the mean of the bounding box. But which form has the bounding box ???
-        Arrays.fill(coefficient, 1 / 2);
+        Arrays.fill(coefficient, 0.5);
         Point_3 center = Point_3.linearCombination(cube, coefficient);
-        float a = (float)pointCloud.min(0).distanceFrom(pointCloud.max(0)); //length of the side of the cube
+        double a = (double)pointCloud.min(0).distanceFrom(pointCloud.max(0)); //length of the side of the cube
 
         /**
          * Initialize the root node
