@@ -21,7 +21,6 @@ public class WSPD {
     
      WSPD(Octree T, double s) {
 
-         
         this.listOfWSPD = WSPD_rec(T.root, T.root, s, new LinkedList<OctreeNode[]>());
     }
     public List<OctreeNode[]> getWSPD(){
@@ -49,7 +48,7 @@ public class WSPD {
             return l;
             // go down the tree
         } else  if (u.children!=null){
-       
+
             for (OctreeNode child_u : u.children) {
                 
                 // use of a linkedlist in parameters to avoid concatenations
@@ -63,13 +62,14 @@ public class WSPD {
     
     // returns the boolean : "u and v are well s separated"
     boolean sSeparated(OctreeNode u, OctreeNode v, double s) {
-        // the ball radius
+        
+        
         if(u.hasExactlyOnePoint() && v.hasExactlyOnePoint()){
             return true;
         }
-        
+        // the ball radius
         double r = (u.a /2.0) * Math.sqrt(3.);
-
+      
         return u.p.distanceFrom(v.p).doubleValue() > r * (s + 2);
         
     }
