@@ -34,9 +34,8 @@ public class FastDiameter_3 implements Diameter_3 {
 		double distance;
 
 		Octree tree = new Octree(points);
-		//double s = 8 / epsilon; // we need a 4/epsilon wspd
-		double s = 2;
-		List<OctreeNode[]> wspd = new WSPD(tree,2.2).getWSPD();
+		double s = 8 / epsilon; // we need a 4/epsilon wspd
+		List<OctreeNode[]> wspd = new WSPD(tree,s).getWSPD();
 		System.out.println(System.currentTimeMillis() - time);
 		for (OctreeNode[] octree_pair : wspd){
 			distance = octree_pair[0].p.distanceFrom(octree_pair[1].p).doubleValue();
