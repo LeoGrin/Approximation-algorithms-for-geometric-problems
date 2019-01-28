@@ -27,16 +27,19 @@ public class FastDiameter_3 implements Diameter_3 {
     public Point_3[] findFarthestPair(Point_3[] points) {
 		if(points.length<2) throw new Error("Error: too few points");
 		System.out.print("Computing farthest pair: fast computation...");
+		double time = System.currentTimeMillis();
 
 		double diameter = 0;
 		Point_3[] final_pair = new Point_3[2];
 		double distance;
 
 		Octree tree = new Octree(points);
-		double s = 8 / epsilon; // we need a 4/epsilon wspd
-		List<OctreeNode[]> pair_list = new WSPD(tree, s).listOfWSPD;
-		for (OctreeNode[] octree_pair : pair_list){
-			distance = (double) octree_pair[0].p.distanceFrom(octree_pair[1].p);
+		//double s = 8 / epsilon; // we need a 4/epsilon wspd
+		double s = 2;
+		List<OctreeNode[]> wspd = new WSPD(tree,2.2).getWSPD();
+		System.out.println(System.currentTimeMillis() - time);
+		for (OctreeNode[] octree_pair : wspd){
+			distance = octree_pair[0].p.distanceFrom(octree_pair[1].p).doubleValue();
 			if (distance > diameter)
 				diameter = distance;
 				final_pair[0] = octree_pair[0].p;
@@ -44,6 +47,7 @@ public class FastDiameter_3 implements Diameter_3 {
 		}
 
 		System.out.println("found diameter " + diameter);
+		System.out.println("in time" + (System.currentTimeMillis() - time));
 
 		System.out.println("done");
 

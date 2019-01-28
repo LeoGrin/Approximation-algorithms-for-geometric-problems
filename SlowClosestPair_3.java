@@ -17,7 +17,9 @@ public class SlowClosestPair_3 implements ClosestPair_3 {
 	 */
     public Point_3[] findClosestPair(Point_3[] points) {
 		if(points.length<2) throw new Error("Error: too few points");
-		
+		double time = System.currentTimeMillis();
+
+
 		System.out.print("Computing closest pair: slow computation...");
 		Point_3[] result=new Point_3[] {points[0], points[1]};
 		Point_3[] pair;
@@ -33,6 +35,7 @@ public class SlowClosestPair_3 implements ClosestPair_3 {
 			}
 		}
 		System.out.println("found distance " + distance);
+		System.out.println("in time" + (System.currentTimeMillis() - time));
 
 		System.out.println("done");
 
