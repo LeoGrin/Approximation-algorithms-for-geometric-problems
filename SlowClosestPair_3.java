@@ -32,6 +32,8 @@ public class SlowClosestPair_3 implements ClosestPair_3 {
 				}
 			}
 		}
+		System.out.println("found distance " + distance);
+
 		System.out.println("done");
 
 		return result;			

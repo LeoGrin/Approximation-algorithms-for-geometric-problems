@@ -32,6 +32,8 @@ public class SlowDiameter_3 implements Diameter_3 {
 				}
 			}
 		}
+		System.out.println("found diameter " + distance);
+
 		System.out.println("done");
 
 		return result;			
