@@ -76,14 +76,22 @@ public class WSPD {
             return true;
         }
         // the ball radius
-        double r;
+        double r_u;
+        double r_v;
         if (u.children == null) {
-            r = (v.a / 2.0) * Math.sqrt(3.);
-        } else {
-            r = (u.a / 2.0) * Math.sqrt(3.);
+            r_v = (v.a / 2.0) * Math.sqrt(3.);
+            r_u = 0;
+        }
+        else if (v.children == null){
+            r_u = (u.a / 2.0) * Math.sqrt(3.);
+            r_v = 0;
+        }
+        else{
+            r_v = (v.a / 2.0) * Math.sqrt(3.);
+            r_u = (u.a / 2.0) * Math.sqrt(3.);
         }
 
-        return u.p.distanceFrom(v.p).doubleValue() > r * (s + 2);
+        return u.p.distanceFrom(v.p).doubleValue() - (r_u + r_v) > s * r_u;
 
     }
 }
