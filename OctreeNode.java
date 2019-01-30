@@ -21,6 +21,7 @@ public class OctreeNode {
 	public OctreeNode father;
 	public Point_3 p; //point stored in a leaf or the middle of the box if the node isn't a leaf
 	public double a; // length of the side of the cube
+	public double force; // force for graph layout
         List<Point_3> test= new LinkedList<>();
 	
 	/**
@@ -95,9 +96,10 @@ public class OctreeNode {
 	public void add(Point_3 p) {
 		;
 	}
-        public boolean hasExactlyOnePoint(){
-            return this.children == null && p!=null;
-        }
+
+	public boolean hasExactlyOnePoint(){
+		return this.children == null && p!=null;
+	}
         @Override
 	public String toString(){
             return "l: "+level+" px: "+Integer.toString((int)(10*p.x))+" a: "+a;
