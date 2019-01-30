@@ -21,7 +21,6 @@ public class OctreeNode {
 	public OctreeNode father;
 	public Point_3 p; //point stored in a leaf or the middle of the box if the node isn't a leaf
 	public double a; // length of the side of the cube
-	public double force; // force for graph layout
         List<Point_3> test= new LinkedList<>();
 	
 	/**
