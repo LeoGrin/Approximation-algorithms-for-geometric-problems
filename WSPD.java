@@ -91,7 +91,7 @@ public class WSPD {
             r_u = (u.a / 2.0) * Math.sqrt(3.);
         }
 
-        return u.p.distanceFrom(v.p).doubleValue() - (r_u + r_v) > s * r_u;
+        return u.p.distanceFrom(v.p).doubleValue() - (r_u + r_v) > s *Math.max( r_u,r_v);
 
     }
 }
