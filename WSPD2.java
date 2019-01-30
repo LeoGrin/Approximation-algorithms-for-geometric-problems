@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Marc
  */
-public class WSPD {
+public class WSPD2 {
 
     // the result
     List<OctreeNode[]> listOfWSPD;

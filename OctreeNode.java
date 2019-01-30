@@ -7,6 +7,8 @@ import java.util.List;
 
 import Jcg.geometry.PointCloud_3;
 import Jcg.geometry.Point_3;
+import Jcg.geometry.Vector_3;
+
 import java.util.LinkedList;
 
 /**
@@ -21,6 +23,7 @@ public class OctreeNode {
 	public OctreeNode father;
 	public Point_3 p; //point stored in a leaf or the middle of the box if the node isn't a leaf
 	public double a; // length of the side of the cube
+	public Vector_3 force; // force for the graph layout computation
         List<Point_3> test= new LinkedList<>();
 	int label=-1;
 	/**

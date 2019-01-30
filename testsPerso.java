@@ -13,7 +13,7 @@ import Jcg.geometry.Point_3;
  */
 public class testsPerso {
     public static void main(String[] args){
-    int n = 1000;
+    int n = 30000;
     Point_3[] ptAleatoires = new Point_3[n];
     for (int i = 0; i < ptAleatoires.length; i++) {
              ptAleatoires[i] = new Point_3(100*Math.random(),100.*Math.random(), 100*Math.random());
@@ -29,6 +29,21 @@ public class testsPerso {
     System.out.println("Fast :");
     tpsDep = System.currentTimeMillis();
     Point_3[] resFast = new FastClosestPair_3().findClosestPair(ptAleatoires);
+    tpsFin = System.currentTimeMillis();
+    System.out.println("dMin : " + resFast[0].distanceFrom(resFast[1]));
+    System.out.println("Temps : "+(tpsFin-tpsDep) +" ms");
+
+
+    System.out.println("Slow :");
+    tpsDep = System.currentTimeMillis();
+    resSlow = new SlowDiameter_3().findFarthestPair(ptAleatoires);
+    tpsFin = System.currentTimeMillis();
+    System.out.println("dMin : " + resSlow[0].distanceFrom(resSlow[1]));
+    System.out.println("Temps : "+(tpsFin-tpsDep) + " ms");
+    System.out.println("");
+    System.out.println("Fast :");
+    tpsDep = System.currentTimeMillis();
+    resFast = new FastDiameter_3(0.7).findFarthestPair(ptAleatoires);
     tpsFin = System.currentTimeMillis();
     System.out.println("dMin : " + resFast[0].distanceFrom(resFast[1]));
     System.out.println("Temps : "+(tpsFin-tpsDep) +" ms");

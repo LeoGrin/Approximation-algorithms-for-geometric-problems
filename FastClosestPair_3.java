@@ -25,6 +25,8 @@ public class FastClosestPair_3 implements ClosestPair_3 {
 		double time = System.currentTimeMillis();
 		Octree T = new Octree(points);
 		List<OctreeNode[]> wspd = new WSPD(T,2.2).getWSPD();
+		System.out.println("wspd size = " + wspd.size());
+
 		//System.out.println(Arrays.deepToString(wspd.toArray()));
 		Point_3[] closestPair =  {points[0],points[1]};
 		double dMin = (double) points[0].distanceFrom(points[1]);

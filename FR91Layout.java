@@ -98,6 +98,8 @@ public class FR91Layout extends Layout {
 			if (norm!=0){
 				u.setPoint(u.p.sum(teta.multiplyByScalar(Math.min(temperature,norm)/norm))); //modify coordinates of u in accordance with computed forces
 			}
+
+
 			i++;
 		}
         this.cooling(); // update temperature
