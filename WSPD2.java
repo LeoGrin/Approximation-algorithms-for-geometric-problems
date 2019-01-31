@@ -21,21 +21,23 @@ public class WSPD2 {
     int i = 0, j = 0, k1 = 0;
     ArrayList<LinkedList<int[]>> lComplet = new ArrayList<>();
 
-    WSPD2(Octree T, double s) {
+    WSPD(Octree T, double s) {
         lComplet.add(null);
+
         this.listOfWSPD = WSPD_rec(T.root, T.root, s, new LinkedList<OctreeNode[]>());
     }
 
     public List<OctreeNode[]> getWSPD() {
         System.out.println("i = " + i);
 
-        //  System.out.println("j = "+j);
+          System.out.println("nb Pts corrigés = "+j);
         //   System.out.println("nb niv2 = "+k);
         return listOfWSPD;
     }
 
     // auxiliary function
     public LinkedList<OctreeNode[]> WSPD_rec(OctreeNode u, OctreeNode v, double s, LinkedList<OctreeNode[]> l) {
+        //System.out.println(u.label+" "+v.label);
         i++;
 
         // insure that the level of u is <= the level of v
@@ -51,16 +53,14 @@ public class WSPD2 {
         }*/
         // if there is no point or if u and v are the same leaf
         if (u.p == null || v.p == null || (u.children == null && v.children == null && u.p.equals(v.p))) {
-            return l;
+           return l;
         } // if u and v are well s separated add (u,v)       
         else if (sSeparated(u, v, s)) {
-            //System.out.println(u.level + " l: "+v.level+"                      Pu: "+Arrays.toString(u.test.toArray()) +" Pv: "+Arrays.toString(v.test.toArray()) );
-            //System.out.println("OK");
             OctreeNode[] AB = {u, v};
             l.add(AB);
             return l;
             // go down the tree
-        } else if (u.level == v.level && u.p.equals(v.p)) {
+        } else if (u.level == v.level && u.p.equals(v.p) && u.children!=null) {
             ArrayList<OctreeNode> labels = new ArrayList<>();
             labels.add(u);
             int k0 = -1;
@@ -71,26 +71,41 @@ public class WSPD2 {
 
                 for (int i = m - (int) Math.pow(8, k0); i < m; i++) {
                     OctreeNode currentNode = labels.get(i);
-                    if (currentNode.children == null) {
+                    
+                    if (currentNode.children==null ) {
                         continuer = false;
                         i = m;
                     } else {
-                        for (OctreeNode child : currentNode.children) {
-                            labels.add(child);
-                        }
+                        labels.addAll(Arrays.asList(currentNode.children));
                     }
                 }
 
             }
-            LinkedList<int[]> c = complet(k0, s);
-
-            for (int[] pair : c) {
+            k0=Math.max(1,k0-1);
+            LinkedList<int[]> c = new LinkedList(complet(k0, s));
+         //   System.out.println("k="+k0);
+           //System.out.println("c "+Arrays.deepToString(c.toArray()));
+          // System.out.println("labels "+Arrays.deepToString(labels.toArray()));
+            while(!c.isEmpty()){
+                int[] pair = c.pop();
                 OctreeNode w = labels.get(pair[0]);
                 OctreeNode z = labels.get(pair[1]);
                 if (w.level == u.level + k0 && z.level == u.level + k0) {
+                   /* if(sSeparated(w.father,z,s))
+                    {
+                    OctreeNode[] AB = {w.father, z};
+                    l.add(AB);
+                    while(labels.get(c.peek()[0]).father.p.equals(w.father.p)){
+                        c.pop();
+                        j++;
+                    }
+                    }
+                    else{*/
                     l = WSPD_rec(w, z, s, l);
+                //    }
 
                 } else {
+               
                     OctreeNode[] AB = {w, z};
                     l.add(AB);
 
@@ -128,17 +143,20 @@ public class WSPD2 {
         // the ball radius
         double r_u;
         double r_v;
-        if (u.children == null) {
-            r_v = (v.a / 2.0) * Math.sqrt(3.);
+        double au = u.a, av=v.a;
+        if(u.complet==OctreeNode.NON_COMPLET) au = u.aMin;
+        if(v.complet==OctreeNode.NON_COMPLET) av = v.aMin;
+        if (u.children == null && !(u.complet==OctreeNode.COMPLET_LEAF)) {
+            r_v = (av / 2.0) * Math.sqrt(3.);
             r_u = 0;
         }
-        else if (v.children == null){
-            r_u = (u.a / 2.0) * Math.sqrt(3.);
+        else if (v.children == null && !(v.complet==OctreeNode.COMPLET_LEAF)){
+            r_u = (au / 2.0) * Math.sqrt(3.);
             r_v = 0;
         }
         else{
-            r_v = (v.a / 2.0) * Math.sqrt(3.);
-            r_u = (u.a / 2.0) * Math.sqrt(3.);
+            r_v = (av / 2.0) * Math.sqrt(3.);
+            r_u = (au / 2.0) * Math.sqrt(3.);
         }
 
         return u.p.distanceFrom(v.p).doubleValue() - (r_u + r_v) > s * Math.max(r_u,r_v);
@@ -177,9 +195,6 @@ public class WSPD2 {
         }
         System.out.print("k=   " + k + "...");
         Octree T = new Octree(points.toArray(new Point_3[points.size()]));
-        for (int l = 0; l < k; l++) {
-
-        }
         reduceTree(T.root, k);
         lComplet.add(WSPD_complet(k, T.root, T.root, s, new LinkedList<OctreeNode[]>()));
         System.out.println("Done");
@@ -203,49 +218,18 @@ public class WSPD2 {
             lLabels.add(a);
         }
         return lLabels;
-    }/*        
-        // insure that the level of u is <= the level of v
-        if (u.level > v.level) {
-            return WSPD_complet(k,v, u, s, l);
-        }
-        
-        
-        if(u.level == k && v.level == k ){
-
-             int[] AB = {u.label, v.label};
-            l.add(AB);
-            return l;
-
-        }
-
-        
-        // if u and v are well s separated add (u,v)       
-        else if (sSeparated(u, v, s)) {
-            //System.out.println(u.level + " l: "+v.level+"                      Pu: "+Arrays.toString(u.test.toArray()) +" Pv: "+Arrays.toString(v.test.toArray()) );
-            //System.out.println("OK");
-            int[] AB = {u.label, v.label};
-            l.add(AB);
-            return l;
-            
-            // go down the tree
-        } else if (u.level < k) {
-
-            for (OctreeNode child_u : u.children) {
-
-                // use of a linkedlist in parameters to avoid concatenations
-                l = WSPD_complet(k,child_u, v, s, l);
-            }
-            return l;
-        } 
-        return null;
-        }
-     */
+    }
+    
+       
+     
     void reduceTree(OctreeNode o, int k) {
         if (k == 0) {
             o.children = null;
+            o.complet = OctreeNode.COMPLET_LEAF;
             return;
         }
         for (OctreeNode on : o.children) {
+            on.complet = OctreeNode.COMPLET_NODE;
             reduceTree(on, k - 1);
         }
     }
