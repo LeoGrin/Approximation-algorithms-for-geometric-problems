@@ -44,15 +44,16 @@ public class Octree {
 
     }
 
-   static double calc_a(ArrayList<Point_3> points_list) {
-       if(points_list.isEmpty()) return 0;
+   static double calc_a(ArrayList<Point_3> points_list,Point_3 p) {
+       if(points_list.size()<2) return 0;
         PointCloud_3 pointCloud = new PointCloud_3(points_list);
         Point_3[] cube = pointCloud.boundingBox();
 
         /**
          * Compute the center and the side length of the bounding box
          */
-        return Math.max(Math.max(cube[1].x - cube[0].x, cube[1].y - cube[0].y), cube[1].z - cube[0].z) * 1.000000001;
+       // return Math.max(Math.max(cube[1].x - cube[0].x, cube[1].y - cube[0].y), cube[1].z - cube[0].z) * 1.000000001;
+       return 2*Math.max(Math.max(Math.max(cube[1].x - p.x,p.x - cube[0].x), Math.max(cube[1].y-p.y,p.y-cube[0].y)), Math.max(cube[1].z-p.z,p.z-cube[0].z)) * 1.000000001;
     }
 
   static  Point_3 calc_p(ArrayList<Point_3> points_list) {
