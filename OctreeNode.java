@@ -7,8 +7,6 @@ import java.util.List;
 
 import Jcg.geometry.PointCloud_3;
 import Jcg.geometry.Point_3;
-import Jcg.geometry.Vector_3;
-
 import java.util.LinkedList;
 
 /**
@@ -18,14 +16,16 @@ import java.util.LinkedList;
  * @version december 2018
  */
 public class OctreeNode {
+    final static int COMPLET_NODE=1,COMPLET_LEAF=2,NON_COMPLET =0;
 	public int level;
 	public OctreeNode[] children=null;
 	public OctreeNode father;
 	public Point_3 p; //point stored in a leaf or the middle of the box if the node isn't a leaf
 	public double a; // length of the side of the cube
-	public Vector_3 force; // force for the graph layout computation
         List<Point_3> test= new LinkedList<>();
 	int label=-1;
+        int complet = NON_COMPLET;
+        double aMin;
 	/**
 	 * Create the octree for storing an input point cloud
 	 */
@@ -38,7 +38,13 @@ public class OctreeNode {
 		this.level = level;
                 this.test = points;
                 this.label = label;
-
+                double rMax = 0;
+                for(Point_3 p1 :points){
+                    if((double)p1.distanceFrom(p)>rMax){
+                        rMax = (double)p1.distanceFrom(p);
+                    }
+        }
+                this.aMin = (rMax*2.000000001)/Math.sqrt(3.0);
 		/**
 		 * If the node is a leaf, set the point stored
 		 */
@@ -85,7 +91,7 @@ public class OctreeNode {
 
 			}
 
-
+ 
 		}
 
 
@@ -99,14 +105,13 @@ public class OctreeNode {
 	public void add(Point_3 p) {
 		;
 	}
-
-	public boolean hasExactlyOnePoint(){
-		return this.children == null && p!=null;
-	}
+        public boolean hasExactlyOnePoint(){
+            return (this.children == null && p!=null) || complet==this.COMPLET_LEAF;
+        }
         @Override
 	public String toString(){
             if(p==null) return null;
-            return "l: "+level+" px: "+Integer.toString((int)(10*p.x))+" a: "+(int)(a*10)/10.+" label: "+Integer.toString(label);
+            return /*"l: "+level+" px: "+Integer.toString((int)(10*p.x))+" a: "+(int)(a*10)/10.+*/" label: "+Integer.toString(label)+" test "+test.size();
         }
         
 }
