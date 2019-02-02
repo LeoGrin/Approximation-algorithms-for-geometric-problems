@@ -41,27 +41,6 @@ public class FastFR91Layout extends Layout {
 	 *  @param C  step length
 	 */
 	public FastFR91Layout(AdjacencyListGraph g, double w, double h) {
-//		System.out.print("Initializing force-directed method: fast Fruchterman-Reingold 91...");
-//		if(g==null) {
-//			System.out.println("Input graph not defined");
-//			System.exit(0);
-//		}
-//		this.g=g;
-//		int N=g.sizeVertices();
-//
-//		// set the parameters of the algorithm FR91
-//		this.C=1.;
-//		this.w=w;
-//		this.h=h;
-//		this.area=w*h/100;
-//		this.k=C*Math.sqrt(area/N);
-//		this.temperature=w/5.; // the temperature is a fraction of the width of the drawing area
-//		this.minTemperature=0.05;
-//		this.coolingConstant=0.98;
-//
-//		System.out.println("done ("+N+" nodes)");
-//		//System.out.println("k="+k+" - temperature="+temperature);
-//		System.out.println(this.toString());
 
 		System.out.print("Initializing force-directed method: Fruchterman-Reingold 91...");
 		if(g==null) {
@@ -107,39 +86,41 @@ public class FastFR91Layout extends Layout {
 
 
 	/**
-	 * Compute the displacement of vertex 'u', due to the attractive forces of its neighbors
+	 * Compute the displacement of vertex 'v', due to the attractive forces of its neighbors
 	 *
-	 * @param u  the vertex to which attractive forces are applied
+	 * @param v  the vertex to which attractive forces are applied
 	 * @return 'disp' a 3d vector storing the displacement of vertex 'u'
 	 */
-	private Vector_3 computeAttractiveForce(Node u) {
-		//throw new Error("To be completed: question 1");
-		Vector_3 attractive_force = new Vector_3(0,0,0);
+	private Vector_3 computeAttractiveForce(Node v) {
+		Vector_3 delta;
+		double norm;
+		Vector_3 disp = new Vector_3(0,0,0);
+		for (Node u : g.getNeighbors(v)){
+			delta= new Vector_3(v.p, u.p);  // compute delat=u-v
+//			System.out.println("delta = " + delta);
+			norm=Math.sqrt((double) delta.squaredLength());  //compute norm of delta
+			if (norm!=0){
+				disp=disp.sum(delta.multiplyByScalar(attractiveForce(norm)/norm));  //compute displacement of v due to u
+//				System.out.println("disp = " + disp);
 
-		for(Node temp : u.neighbors)
-		{
-			double distance = u.p.distanceFrom(temp.p).doubleValue();
-			//double aF = distance * distance / this.k;
-			double aF = attractiveForce(distance);
-			attractive_force.x += (temp.p.x - u.p.x) / distance * aF;
-			attractive_force.y += (temp.p.y - u.p.y) / distance * aF;
-			attractive_force.z += (temp.p.z - u.p.z) / distance * aF;
+			}
 		}
-		return attractive_force;
+		return disp;
 	}
 
 
 	/**
-	 * Compute, for each pair in the WSPD, the displacement due to repulsive forces
+	 * Compute, for each pair in the WSPD, compute the displacement due to repulsive forces
 	 *
-	 * @return an octree with each node storing its force and the force of its children
+	 * @return an octree with each node storing the force applied to itself by the nodes paired with itself in the wspd
 	 */
 	private OctreeGraph computeAllRepulsiveForcesWSPD() {
 
 		//Compute Octree from the points
 		OctreeGraph T = new OctreeGraph(g);
 		//Compute wspd from octree
-		List<OctreeNodeGraph[]> wspd = new WSPDGraph(T,2).getWSPD(); // which s ??
+		List<OctreeNodeGraph[]> wspd = new WSPDGraph(T,1).getWSPD(); // which s ??
+
 
 
 		//Compute the forces between each node of the wspd only
@@ -150,11 +131,15 @@ public class FastFR91Layout extends Layout {
 		for (OctreeNodeGraph[] pair:wspd){
 			delta= new Vector_3(pair[0].barycenter, pair[1].barycenter);  // compute delat=u-v
 			norm=Math.sqrt((double) delta.squaredLength());  //compute norm of delta
+
+//			System.out.println("delta = " + delta);
+
+
 			if (norm!=0){
-				displacement=displacement.sum(delta.multiplyByScalar(repulsiveForce(norm)/norm)); //compute displacement of pair[1] due to pair[0]
+				displacement=delta.multiplyByScalar(repulsiveForce(norm)/norm); //compute displacement of pair[1] due to pair[0]
+//				System.out.println("displacement = " + displacement);
 			}
-			pair[1].force = displacement.multiplyByScalar(pair[0].n_points);
-			pair[0].force = displacement.multiplyByScalar(-1 * pair[1].n_points);
+			pair[1].force = pair[1].force.sum(displacement.multiplyByScalar(pair[0].n_points));
 		}
 		return T;
 	}
@@ -162,13 +147,12 @@ public class FastFR91Layout extends Layout {
 
 	/**
 	 * Compute the final repulsive force for each node by summing the force of a node to its children in the Octree (We do a BFS)
-	 *At the same time, compute the attractive forces for each leaf, and move the graph nodes (so we go throouh the octree only once)
-	 *
+	 *At the same time, compute the attractive forces for each leaf (so we pass through the tree only one time for both summing and computing the attractive forces)
+	 * @Return nothing, just update the octree T by updating the parameter "force" of each node
 	 */
 	private void computeAllForcesfromTree(OctreeGraph T) {
 		OctreeNodeGraph tree_node;
 		Node graph_node;
-		double norm;
 		LinkedList<OctreeNodeGraph> queue = new LinkedList<OctreeNodeGraph>(); // for the BFS
 		queue.add(T.root);
 		while (queue.size() > 0){
@@ -185,14 +169,46 @@ public class FastFR91Layout extends Layout {
 				graph_node = tree_node.graph_node;
 				// compute attractive force from the node stored in the leaf
 				tree_node.force = tree_node.force.sum(computeAttractiveForce(graph_node));
-				// Move the node accordingly
+
+			}
+		}
+	}
+
+	/**
+	 * Move the graph nodes according to the forces stored in the nodes.
+	 * We do a BFS to access the leaf of the tree, which store as parameters both the graph node and the force we should apply to it
+	 * @Return nothing
+	 */
+	private void moveGraphFromTree(OctreeGraph T) {
+		OctreeNodeGraph tree_node;
+		Node graph_node;
+		double norm;
+
+		LinkedList<OctreeNodeGraph> queue = new LinkedList<OctreeNodeGraph>(); // for the BFS
+		queue.add(T.root);
+
+		// BFS though the octree to access the force from the tree and the graph node associated with the force
+		while (queue.size() > 0){
+
+			tree_node = queue.removeFirst();
+			if (tree_node.children != null){
+				for (OctreeNodeGraph u:tree_node.children){
+					queue.addLast(u);
+				}
+			}
+			else if (tree_node.p != null){
+				graph_node = tree_node.graph_node;
+				// Normalize the force with the temperature
 				norm = Math.sqrt((double) tree_node.force.squaredLength());  // norm of the force on graph_node
+				// Move the graph node
 				if (norm != 0) {
 					graph_node.setPoint(graph_node.p.sum(tree_node.force.multiplyByScalar(Math.min(temperature, norm) / norm))); //modify coordinates of u in accordance with computed forces
 				}
 			}
 		}
 	}
+
+
 
 
 
@@ -213,8 +229,10 @@ public class FastFR91Layout extends Layout {
 
 		// Compute the octree associated with the graph nodes positions and compute the repulsive forces for each pair
 		OctreeGraph T = computeAllRepulsiveForcesWSPD();
-		// Sum these forces along to children and at the same time 1) compute the attractive forces 2) move the graph nodes . This way we go through the tree only once
+		// Sum these forces along to children and at the same time compute the attractive forces
 		computeAllForcesfromTree(T);
+		// Move the graph nodes
+		moveGraphFromTree(T);
 
 
 

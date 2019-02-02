@@ -40,10 +40,13 @@ public class WSPD {
 
         // if there is no point or if u and v are the same leaf
         if (u.p == null || v.p == null || (u.children == null && v.children == null && u.p.equals(v.p))) {
+
+
             return l;
-        } 
-        // if u and v are well s separated add (u,v)       
+        }
+        // if u and v are well s separated add (u,v)
         else if (sSeparated(u, v, s)) {
+
             //System.out.println(u.level + " l: "+v.level+"                      Pu: "+Arrays.toString(u.test.toArray()) +" Pv: "+Arrays.toString(v.test.toArray()) );
             //System.out.println("OK");
             OctreeNode[] AB = {u, v};
@@ -51,6 +54,7 @@ public class WSPD {
             return l;
             // go down the tree
         } else if (u.children != null) {
+
 
             for (OctreeNode child_u : u.children) {
 

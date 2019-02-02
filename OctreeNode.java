@@ -108,10 +108,58 @@ public class OctreeNode {
         public boolean hasExactlyOnePoint(){
             return (this.children == null && p!=null) || complet==this.COMPLET_LEAF;
         }
+
         @Override
 	public String toString(){
             if(p==null) return null;
             return /*"l: "+level+" px: "+Integer.toString((int)(10*p.x))+" a: "+(int)(a*10)/10.+*/" label: "+Integer.toString(label)+" test "+test.size();
         }
+//
+//	@Override
+//	public String toString() {
+//		String s = "";
+//		if (this.p != null) {
+//			s = this.p.toString();
+//		}
+//		else{
+//			s = "null";
+//		}
+//		if (this.children != null) {
+//			s += "{";
+//			for (OctreeNode uk : this.children) {
+//				s += uk.toString();
+//			}
+//			s += "}";
+//		}
+//
+//		return s;
+//
+//	}
+
+	public LinkedList<Point_3> getPoints() {
+
+		LinkedList<Point_3> points = getPointsRec(new LinkedList<Point_3>());
+		return points;
+
+	}
+
+	public LinkedList<Point_3> getPointsRec(LinkedList<Point_3> points) {
+
+		if(this.p != null) {
+			points.add(this.p);
+			return points;
+		}
+		if (this.children != null) {
+
+			for (OctreeNode uk : this.children) {
+				points = uk.getPointsRec(points);
+
+			}
+			return points;
+
+		}
+		return points;
+
+	}
         
 }

@@ -26,6 +26,9 @@ public class Octree {
             points_list.add(p);
         }
         PointCloud_3 pointCloud = new PointCloud_3(points_list);
+
+
+
         Point_3[] cube = pointCloud.boundingBox();
 
         /**
@@ -56,6 +59,8 @@ public class Octree {
        return 2*Math.max(Math.max(Math.max(cube[1].x - p.x,p.x - cube[0].x), Math.max(cube[1].y-p.y,p.y-cube[0].y)), Math.max(cube[1].z-p.z,p.z-cube[0].z)) * 1.000000001;
     }
 
+
+
   static  Point_3 calc_p(ArrayList<Point_3> points_list) {
       if(points_list.isEmpty()) return null;
         PointCloud_3 pointCloud = new PointCloud_3(points_list);
@@ -63,5 +68,14 @@ public class Octree {
         Number coefficient[] = new Number[2]; // we want the mean of the cube, so we take the mean of the bounding box. But which form has the bounding box ???
         Arrays.fill(coefficient, 0.5);
         return Point_3.linearCombination(cube, coefficient);
+    }
+
+    @Override
+    public String toString() {
+        String s = "";
+        s += root.toString();
+
+        return s;
+
     }
 }

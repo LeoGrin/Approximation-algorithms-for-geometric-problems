@@ -13,7 +13,7 @@ import Jcg.geometry.Point_3;
  */
 public class testsPerso {
     public static void main(String[] args){
-    int n = 30000;
+    int n = 10000;
     Point_3[] ptAleatoires = new Point_3[n];
     for (int i = 0; i < ptAleatoires.length; i++) {
              ptAleatoires[i] = new Point_3(100*Math.random(),100.*Math.random(), 100*Math.random());

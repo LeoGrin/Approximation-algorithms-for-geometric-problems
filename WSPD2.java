@@ -21,7 +21,7 @@ public class WSPD2 {
     int i = 0, j = 0, k1 = 0;
     ArrayList<LinkedList<int[]>> lComplet = new ArrayList<>();
 
-    WSPD(Octree T, double s) {
+    WSPD2(Octree T, double s) {
         lComplet.add(null);
 
         this.listOfWSPD = WSPD_rec(T.root, T.root, s, new LinkedList<OctreeNode[]>());
