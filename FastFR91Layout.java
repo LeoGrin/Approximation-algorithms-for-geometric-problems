@@ -29,6 +29,7 @@ public class FastFR91Layout extends Layout {
 	public double coolingConstant; // constant term: the temperature decreases linearly at each iteration
 	public boolean useCooling; // say whether performing simulated annealing
 	private OctreeGraph T; // current octree (we don't compute it at each step)
+	private List<OctreeNodeGraph[]> wspd; // current wspd (we don't compute it at each step)
 	
 	public int iterationCount=0; // count the number of performed iterations
 	private int countRepulsive=0; // count the number of computed repulsive forces (to measure time performances)
@@ -119,19 +120,12 @@ public class FastFR91Layout extends Layout {
 	 */
 	private OctreeGraph computeAllRepulsiveForcesWSPD() {
 
-		//Compute Octree from the points
-		OctreeGraph T = new OctreeGraph(g);
-		//Compute wspd from octree
-		List<OctreeNodeGraph[]> wspd = new WSPDGraph(T,1).getWSPD(); // which s ??
-
-
-
 		//Compute the forces between each node of the wspd only
 
 		Vector_3 delta;
 		double norm;
 		Vector_3 displacement = new Vector_3(0,0,0);
-		for (OctreeNodeGraph[] pair:wspd){
+		for (OctreeNodeGraph[] pair:this.wspd){
 			delta= new Vector_3(pair[0].barycenter, pair[1].barycenter);  // compute delat=u-v
 			norm=Math.sqrt((double) delta.squaredLength());  //compute norm of delta
 
@@ -230,17 +224,18 @@ public class FastFR91Layout extends Layout {
 		// ---------- Complete this function ---
 		// make use of the WSPD to approximate repulsive forces
 
-		// Compute the octree associated with the graph nodes positions and compute the repulsive forces for each pair
-		System.out.println();
-		System.out.println( 5 * log(this.iterationCount + 1));
-		System.out.println(Math.floor(5 * log(this.iterationCount + 1)));
-		System.out.println( 5 * log(this.iterationCount));
-		System.out.println(Math.floor(5 * log(this.iterationCount )));
+		// Compute the octree associated with the graph nodes positions and the corresponding wspd
+		if (Math.floor(5 * log(this.iterationCount + 1)) > Math.floor(5 * log(this.iterationCount))) { // update the structure only if floor(5 * log(i)) changes
 
-		if (Math.floor(20 * log(this.iterationCount + 1)) > Math.floor(20 * log(this.iterationCount))) { // update the tree only if floor(5 * log(i)) changes
-			this.T = computeAllRepulsiveForcesWSPD();
+			//Compute Octree from the points
+			this.T = new OctreeGraph(g);
+			//Compute wspd from octree
+			this.wspd = new WSPDGraph(this.T,1).getWSPD(); // which s ??
 			System.out.println("change");
 		}
+
+		//compute the repulsive forces for each pair of the wspd
+		computeAllRepulsiveForcesWSPD();
 		// Sum these forces along to children and at the same time compute the attractive forces
 		computeAllForcesfromTree(this.T);
 		// Move the graph nodes
