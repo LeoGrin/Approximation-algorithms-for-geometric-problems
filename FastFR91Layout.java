@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import static java.lang.Math.log;
+
 /**
  * A class implementing the Fruchterman and Reingold method with fast approximation of repulsive forces
  * using a WSPD
@@ -26,6 +28,7 @@ public class FastFR91Layout extends Layout {
 	public double minTemperature; // minimal temperature (strictly positive)
 	public double coolingConstant; // constant term: the temperature decreases linearly at each iteration
 	public boolean useCooling; // say whether performing simulated annealing
+	private OctreeGraph T; // current octree (we don't compute it at each step)
 	
 	public int iterationCount=0; // count the number of performed iterations
 	private int countRepulsive=0; // count the number of computed repulsive forces (to measure time performances)
@@ -228,11 +231,20 @@ public class FastFR91Layout extends Layout {
 		// make use of the WSPD to approximate repulsive forces
 
 		// Compute the octree associated with the graph nodes positions and compute the repulsive forces for each pair
-		OctreeGraph T = computeAllRepulsiveForcesWSPD();
+		System.out.println();
+		System.out.println( 5 * log(this.iterationCount + 1));
+		System.out.println(Math.floor(5 * log(this.iterationCount + 1)));
+		System.out.println( 5 * log(this.iterationCount));
+		System.out.println(Math.floor(5 * log(this.iterationCount )));
+
+		if (Math.floor(20 * log(this.iterationCount + 1)) > Math.floor(20 * log(this.iterationCount))) { // update the tree only if floor(5 * log(i)) changes
+			this.T = computeAllRepulsiveForcesWSPD();
+			System.out.println("change");
+		}
 		// Sum these forces along to children and at the same time compute the attractive forces
-		computeAllForcesfromTree(T);
+		computeAllForcesfromTree(this.T);
 		// Move the graph nodes
-		moveGraphFromTree(T);
+		moveGraphFromTree(this.T);
 
 
 
