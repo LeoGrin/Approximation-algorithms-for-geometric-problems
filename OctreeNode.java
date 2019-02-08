@@ -1,13 +1,6 @@
 
-import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import Jcg.geometry.PointCloud_3;
 import Jcg.geometry.Point_3;
-import java.util.LinkedList;
 
 /**
  * A class for representing a node of an Octree
@@ -15,17 +8,18 @@ import java.util.LinkedList;
  * @author Luca Castelli Aleardi, Ecole Polytechnique
  * @version december 2018
  */
+
 public class OctreeNode {
+    
     final static int COMPLET_NODE=1,COMPLET_LEAF=2,NON_COMPLET =0;
 	public int level;
 	public OctreeNode[] children=null;
 	public OctreeNode father;
 	public Point_3 p; //point stored in a leaf or the middle of the box if the node isn't a leaf
 	public double a; // length of the side of the cube
-        List<Point_3> test= new LinkedList<>();
-	int label=-1;
-        int complet = NON_COMPLET;
-        double aMin;
+	int label=-1;// to identify the node
+        int complet = NON_COMPLET; // NON_COMPLET if we are not in the precomputation
+        double aMin; // best radius
 	/**
 	 * Create the octree for storing an input point cloud
 	 */
@@ -33,11 +27,12 @@ public class OctreeNode {
 		int i;
 		Point_3 new_center;
 		this.father = father;
-		this.p = p;//Octree.calc_p(points);
-		this.a = a;//Octree.calc_a(points);
+		this.p = p;
+		this.a = a;
 		this.level = level;
-                this.test = points;
                 this.label = label;
+                
+                // compute the best radius
                 double rMax = 0;
                 for(Point_3 p1 :points){
                     if((double)p1.distanceFrom(p)>rMax){
@@ -45,6 +40,8 @@ public class OctreeNode {
                     }
         }
                 this.aMin = (rMax*2.000000001)/Math.sqrt(3.0);
+                
+          
 		/**
 		 * If the node is a leaf, set the point stored
 		 */
@@ -99,67 +96,15 @@ public class OctreeNode {
 
 	}
 	
-	/**
-	 * Add a node into the OctreeNode
-	 */
-	public void add(Point_3 p) {
-		;
-	}
+        
         public boolean hasExactlyOnePoint(){
             return (this.children == null && p!=null) || complet==this.COMPLET_LEAF;
         }
-
+        
         @Override
 	public String toString(){
             if(p==null) return null;
-            return /*"l: "+level+" px: "+Integer.toString((int)(10*p.x))+" a: "+(int)(a*10)/10.+*/" label: "+Integer.toString(label)+" test "+test.size();
+            return "l: "+level+" px: "+Integer.toString((int)(10*p.x))+" a: "+(int)(a*10)/10.+" label: "+Integer.toString(label);
         }
-//
-//	@Override
-//	public String toString() {
-//		String s = "";
-//		if (this.p != null) {
-//			s = this.p.toString();
-//		}
-//		else{
-//			s = "null";
-//		}
-//		if (this.children != null) {
-//			s += "{";
-//			for (OctreeNode uk : this.children) {
-//				s += uk.toString();
-//			}
-//			s += "}";
-//		}
-//
-//		return s;
-//
-//	}
-
-	public LinkedList<Point_3> getPoints() {
-
-		LinkedList<Point_3> points = getPointsRec(new LinkedList<Point_3>());
-		return points;
-
-	}
-
-	public LinkedList<Point_3> getPointsRec(LinkedList<Point_3> points) {
-
-		if(this.p != null) {
-			points.add(this.p);
-			return points;
-		}
-		if (this.children != null) {
-
-			for (OctreeNode uk : this.children) {
-				points = uk.getPointsRec(points);
-
-			}
-			return points;
-
-		}
-		return points;
-
-	}
         
 }
