@@ -32,7 +32,11 @@ public class NetworkLayout extends DrawGraph {
 		String filename=args[0];
 		GraphReader reader=new GraphReader_MTX(); // open networks stores in Matrix Market format (.mtx)
 		AdjacencyListGraph g=reader.read(filename); // read input network from file
+
+		//FastFR91Layout fast = new FastFR91Layout(g, 400, 400);
+
 		Layout.setRandomPoints(g, 400, 400); // set initial locations at random
+
 		
 		DrawGraph.inputGraph=g; // set the input network
 

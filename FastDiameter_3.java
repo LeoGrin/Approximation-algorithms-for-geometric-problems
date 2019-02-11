@@ -35,11 +35,12 @@ public class FastDiameter_3 implements Diameter_3 {
 
 		Octree tree = new Octree(points);
 
-		double s = 2 / epsilon; // we need a 4/epsilon wspd
+		double s = 4 / epsilon; // we need a 4/epsilon wspd
+
 		List<OctreeNode[]> wspd = new WSPD(tree,s).getWSPD();
 		System.out.println("wspd size = " + wspd.size());
 
-		System.out.println(System.currentTimeMillis() - time);
+		// compute the distance for each pair in the WSPD
 		for (OctreeNode[] octree_pair : wspd){
 			distance = octree_pair[0].p.distanceFrom(octree_pair[1].p).doubleValue();
 			if (distance > diameter) {
@@ -48,6 +49,9 @@ public class FastDiameter_3 implements Diameter_3 {
 				final_pair[1] = octree_pair[1].p;
 			}
 		}
+		System.out.print("in time ");
+		System.out.println(System.currentTimeMillis() - time);
+
 
 		System.out.println("found diameter = " + diameter);
 

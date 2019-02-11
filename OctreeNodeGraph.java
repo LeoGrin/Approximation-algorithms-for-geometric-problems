@@ -17,7 +17,7 @@ import jdg.graph.Node;
 import java.util.LinkedList;
 
 /**
- * A class for representing a node of an Octree
+ * A class for representing a node of an Octree for graph layout computation (nodes store forces, barycenter of subtree and graph vertices)
  *
  * @author Luca Castelli Aleardi, Ecole Polytechnique
  * @version december 2018

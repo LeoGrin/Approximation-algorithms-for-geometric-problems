@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * A class for representing an Octree
+ * A class for representing an quadtree for graph layout computation (nodes store forces, barycenter and graph vertices)
  *
  * @author Luca Castelli Aleardi, Ecole Polytechnique
  * @version december 2018

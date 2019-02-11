@@ -23,6 +23,7 @@ public class FR91Layout extends Layout {
 	
 	public int iterationCount=0; // count the number of performed iterations
 	private int countRepulsive=0; // count the number of computed repulsive forces (to measure time performances)
+	public double accumulated_time = 0;
 	
 	/**
 	 * Initialize the parameters of the force-directed layout
@@ -50,6 +51,7 @@ public class FR91Layout extends Layout {
 		this.temperature=w/2.; // the temperature is a fraction of the width of the drawing area
 		this.minTemperature=0.1;
 		this.coolingConstant=0.97;
+		this.accumulated_time = 0;
 		
 		System.out.println("done ("+N+" nodes)");
 		//System.out.println("k="+k+" - temperature="+temperature);
@@ -107,7 +109,8 @@ public class FR91Layout extends Layout {
 		// evaluate time performances
     	endTime=System.nanoTime();
         double duration=(double)(endTime-startTime)/1000000000.;
-        System.out.println("iteration "+this.iterationCount+" done ("+duration+" seconds)");
+        this.accumulated_time += duration;
+        System.out.println("iteration "+this.iterationCount+" done ("+duration+" seconds) " + "accumulated time = " + this.accumulated_time);
 		this.iterationCount++; // increase counter (to count the number of performed iterations)
 	}
 	

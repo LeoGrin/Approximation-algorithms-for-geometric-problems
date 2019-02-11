@@ -2,10 +2,15 @@
 
 import Jcg.geometry.Point_3;
 import Jcg.geometry.Vector_3;
+import com.opencsv.CSVWriter;
 import jdg.graph.AdjacencyListGraph;
 import jdg.graph.Node;
 import jdg.layout.Layout;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.EmptyStackException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -30,11 +35,13 @@ public class FastFR91Layout extends Layout {
 	public boolean useCooling; // say whether performing simulated annealing
 	private OctreeGraph T; // current octree (we don't compute it at each step)
 	private List<OctreeNodeGraph[]> wspd; // current wspd (we don't compute it at each step)
+	public double max_displacement; //for convergence checking
+	public double dt; //how often we should recompute our octree
 	
 	public int iterationCount=0; // count the number of performed iterations
 	private int countRepulsive=0; // count the number of computed repulsive forces (to measure time performances)
 	
-	private double accumulated_time = 0;
+	public double accumulated_time = 0;
 	
 	/**
 	 * Initialize the parameters of the force-directed layout
@@ -53,6 +60,8 @@ public class FastFR91Layout extends Layout {
 		}
 		this.g=g;
 		int N=g.sizeVertices();
+		this.max_displacement = 0;
+		this.dt=5;
 
 		// set the parameters of the algorithm FR91
 		this.C=5.;
@@ -68,7 +77,11 @@ public class FastFR91Layout extends Layout {
 		//System.out.println("k="+k+" - temperature="+temperature);
 		System.out.println(this.toString());
 	}
-	
+
+	public void setDt(double dt) {
+		this.dt = dt;
+	}
+
 	/**
 	 * Compute the (intensity of the) attractive force between two nodes at a given distance
 	 * 
@@ -197,6 +210,8 @@ public class FastFR91Layout extends Layout {
 				graph_node = tree_node.graph_node;
 				// Normalize the force with the temperature
 				norm = Math.sqrt((double) tree_node.force.squaredLength());  // norm of the force on graph_node
+				if (norm > this.max_displacement)
+					this.max_displacement = norm;
 				// Move the graph node
 				if (norm != 0) {
 					graph_node.setPoint(graph_node.p.sum(tree_node.force.multiplyByScalar(Math.min(temperature, norm) / norm))); //modify coordinates of u in accordance with computed forces
@@ -225,7 +240,8 @@ public class FastFR91Layout extends Layout {
 		// make use of the WSPD to approximate repulsive forces
 
 		// Compute the octree associated with the graph nodes positions and the corresponding wspd
-		if (Math.floor(5 * log(this.iterationCount + 1)) > Math.floor(5 * log(this.iterationCount))) { // update the structure only if floor(5 * log(i)) changes
+		this.max_displacement = 0;
+		if ((Math.floor(this.dt * log(this.iterationCount + 1)) > Math.floor(this.dt * log(this.iterationCount)))) { // update the structure only if floor(5 * log(i)) changes
 
 			//Compute Octree from the points
 			this.T = new OctreeGraph(g);
@@ -240,7 +256,6 @@ public class FastFR91Layout extends Layout {
 		computeAllForcesfromTree(this.T);
 		// Move the graph nodes
 		moveGraphFromTree(this.T);
-
 
 
 

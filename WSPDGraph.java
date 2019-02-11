@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  *
- * @author Marc
+ * Class to compute a WSPD but compatible with OctreeGraph and OctreeNodeGraph for graph layout computation
  */
 public class WSPDGraph {
 
@@ -44,8 +44,6 @@ public class WSPDGraph {
         }
         // if u and v are well s separated add (u,v)
         else if (sSeparated(u, v, s)) {
-            //System.out.println(u.level + " l: "+v.level+"                      Pu: "+Arrays.toString(u.test.toArray()) +" Pv: "+Arrays.toString(v.test.toArray()) );
-            //System.out.println("OK");
             OctreeNodeGraph[] AB = {u, v};
             l.add(AB);
             return l;

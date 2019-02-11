@@ -102,7 +102,7 @@ public class PointCloudViewer extends PApplet {
 		}
 
 		public void fastDiameter() {
-			double epsilon=0.7; // approximation factor
+			double epsilon=0.1; // approximation factor
 			this.selectedPoints=null;
 			Point_3[] inputPoints=this.points.toArray(); // input point cloud
 			Diameter_3 slow=new FastDiameter_3(epsilon);
